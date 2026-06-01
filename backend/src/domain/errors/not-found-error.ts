@@ -1,0 +1,10 @@
+import { AppError } from "./app-error.js";
+import { HttpStatus } from "./http-status.enum";
+
+export class NotFoundError extends AppError {
+  constructor(resource = "Resource") {
+    super(`${resource} not found`, HttpStatus.NOT_FOUND);
+  }
+}
+
+// throw new NotFoundError("User"); exemplo de uso 
