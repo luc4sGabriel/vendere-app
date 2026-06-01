@@ -1,7 +1,7 @@
 import { UserRepository } from '../../domain/user/user.repository'
-import { AppError } from '../../domain/errors/AppError'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
+import { UnauthorizedError } from '../../domain/errors/unauthorized-error'
 
 export class LoginUserUseCase {
   constructor(private userRepository: UserRepository) {}
@@ -9,11 +9,11 @@ export class LoginUserUseCase {
   async execute(email: string, password: string) {
     const user = await this.userRepository.findByEmail(email)
 
-    if (!user) throw new AppError('Invalid credentials', 401)
+    if (!user) throw new UnauthorizedError('Invalid credentials')
 
     const passwordMatch = await bcrypt.compare(password, user.password)
 
-    if (!passwordMatch) throw new AppError('Invalid credentials', 401)
+    if (!passwordMatch) throw new UnauthorizedError('Invalid credentials')
 
     const token = jwt.sign(
       { id: user.id, role: user.role },
