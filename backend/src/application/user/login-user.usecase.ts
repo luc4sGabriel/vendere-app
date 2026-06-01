@@ -2,6 +2,7 @@ import { UserRepository } from '../../domain/user/user.repository'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { UnauthorizedError } from '../../domain/errors/unauthorized-error'
+import { AppError } from '../../domain/errors/app-error'
 
 export class LoginUserUseCase {
   constructor(private userRepository: UserRepository) {}
@@ -15,11 +16,11 @@ export class LoginUserUseCase {
 
     if (!passwordMatch) throw new UnauthorizedError('Invalid credentials')
 
-    const token = jwt.sign(
-      { id: user.id, role: user.role },
-      process.env.JWT_SECRET!,
-      { expiresIn: '7d' }
-    )
+      const secret = process.env.JWT_SECRET
+     if (!secret) {
+       throw new AppError('JWT_SECRET environment variable is required')
+     }
+     const token = jwt.sign({ id: user.id, role: user.role }, secret, { expiresIn: '7d' })
 
     return {
       user: { id: user.id, name: user.name, email: user.email, role: user.role },
