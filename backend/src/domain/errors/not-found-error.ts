@@ -1,4 +1,4 @@
-import { AppError } from "./app-error.js";
+import { AppError } from "./app-error";
 import { HttpStatus } from "./http-status.enum";
 
 export class NotFoundError extends AppError {

@@ -1,7 +1,6 @@
 import { UserRepository } from '../../domain/user/user.repository'
-import { AppError } from '../../domain/errors/app-error'
 import bcrypt from 'bcryptjs'
-import { UnauthorizedError } from '../../domain/errors/unauthorized-error'
+import { ConflictError } from '../../domain/errors/conflict-error'
 
 export class RegisterUserUseCase {
   constructor(private userRepository: UserRepository) {}
@@ -9,7 +8,7 @@ export class RegisterUserUseCase {
   async execute(name: string, email: string, password: string) {
     const userExists = await this.userRepository.findByEmail(email)
 
-    if (userExists) throw new UnauthorizedError('Email already in use')
+    if (userExists) throw new ConflictError('Email already in use')
 
     const hashedPassword = await bcrypt.hash(password, 8)
 
