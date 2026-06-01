@@ -1,0 +1,10 @@
+services:
+  database:
+    image: postgres:latest
+    container_name: vendere_db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: vendere_app
+    ports:
+      - "5432:5432"
