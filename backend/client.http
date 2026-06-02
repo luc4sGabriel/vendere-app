@@ -16,3 +16,22 @@ Content-Type: application/json
   "email": "joao@email.com",
   "password": "123456"
 }
+
+### Criar categoria (precisamos do categoryId)
+POST http://localhost:3333/products
+Authorization: Bearer SEU_TOKEN_AQUI
+Content-Type: application/json
+
+{
+  "name": "Tênis Air Max",
+  "description": "Tênis confortável",
+  "price": 299.90,
+  "stock": 10,
+  "categoryId": "ID_DA_CATEGORIA"
+}
+
+### Listar produtos
+GET http://localhost:3333/products
+
+### Buscar por nome
+GET http://localhost:3333/products?name=tenis
