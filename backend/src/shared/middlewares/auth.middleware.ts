@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
-import { UnauthorizedError } from '../../../domain/errors/unauthorized-error'
-import { ForbiddenError } from '../../../domain/errors/forbidden-error'
+import { UnauthorizedError } from '../errors/unauthorized-error'
+import { ForbiddenError } from '../errors/forbidden-error'
 
 interface TokenPayload {
   id: string
@@ -28,7 +28,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
     req.user = decoded
     next()
   } catch {
-    throw new UnauthorizedError('Invalid token')
+    next(new UnauthorizedError('Invalid token'))
   }
 }
 

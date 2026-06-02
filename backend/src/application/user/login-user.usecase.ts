@@ -1,8 +1,8 @@
 import { UserRepository } from '../../domain/user/user.repository'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import { UnauthorizedError } from '../../domain/errors/unauthorized-error'
-import { AppError } from '../../domain/errors/app-error'
+import { UnauthorizedError } from '../../shared/errors/unauthorized-error'
+import { AppError } from '../../shared/errors/app-error'
 
 export class LoginUserUseCase {
   constructor(private userRepository: UserRepository) {}

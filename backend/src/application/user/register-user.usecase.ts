@@ -1,6 +1,6 @@
 import { UserRepository } from '../../domain/user/user.repository'
 import bcrypt from 'bcryptjs'
-import { ConflictError } from '../../domain/errors/conflict-error'
+import { ConflictError } from '../../shared/errors/conflict-error'
 
 export class RegisterUserUseCase {
   constructor(private userRepository: UserRepository) {}
