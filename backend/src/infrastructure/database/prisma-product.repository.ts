@@ -1,43 +1,45 @@
 import { prisma } from '../lib/prisma'
+import { ProductRepository, CreateProductData, ProductFilters } from '../../domain/product/product.repository'
+import { ProductMapper } from './mappers/product.mapper'
+import { PaginatedResponse } from '../../shared/types/pagination.types'
+import { buildPaginatedResponse, getPrismaSkip } from '../../shared/utils/pagination'
 import { ProductEntity } from '../../domain/product/product.entity'
-import { ProductRepository, CreateProductData } from '../../domain/product/product.repository'
 
 export class PrismaProductRepository implements ProductRepository {
-  private toEntity(p: any): ProductEntity {
-    return new ProductEntity(
-      p.id, p.name, p.description, Number(p.price),
-      p.stock, p.imageUrl, p.active, p.categoryId, p.createdAt
-    )
+  async findAll(filters: ProductFilters): Promise<PaginatedResponse<ProductEntity>> {
+    const { page = 1, limit = 10, categoryId, name } = filters
+    const skip = getPrismaSkip(page, limit)
+  
+    const where = {
+      active: true,
+      ...(categoryId && { categoryId }),
+      ...(name && { name: { contains: name, mode: 'insensitive' as const } })
+    }
+  
+    const [products, total] = await prisma.$transaction([
+      prisma.product.findMany({ where, skip, take: limit, orderBy: { createdAt: 'desc' } }),
+      prisma.product.count({ where })
+    ])
+  
+    return buildPaginatedResponse(products.map(ProductMapper.toDomain), total, page, limit)
   }
 
-  async findAll(filters?: { categoryId?: string; name?: string }) {
-    const products = await prisma.product.findMany({
-      where: {
-        active: true,
-        ...(filters?.categoryId && { categoryId: filters.categoryId }),
-        ...(filters?.name && { name: { contains: filters.name, mode: 'insensitive' } })
-      }
-    })
-    return products.map(this.toEntity)
-  }
-
-  async findById(id: string) {
+  async findById(id: string): Promise<ProductEntity | null> {
     const product = await prisma.product.findUnique({ where: { id } })
-    if (!product) return null
-    return this.toEntity(product)
+    return product ? ProductMapper.toDomain(product) : null
   }
 
-  async create(data: CreateProductData) {
+  async create(data: CreateProductData): Promise<ProductEntity> {
     const product = await prisma.product.create({ data })
-    return this.toEntity(product)
+    return ProductMapper.toDomain(product)
   }
 
-  async update(id: string, data: Partial<CreateProductData>) {
+  async update(id: string, data: Partial<CreateProductData>): Promise<ProductEntity> {
     const product = await prisma.product.update({ where: { id }, data })
-    return this.toEntity(product)
+    return ProductMapper.toDomain(product)
   }
 
-  async delete(id: string) {
+  async delete(id: string): Promise<void> {
     await prisma.product.update({ where: { id }, data: { active: false } })
   }
 }

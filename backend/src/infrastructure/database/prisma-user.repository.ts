@@ -1,35 +1,21 @@
 import { prisma } from '../lib/prisma'
+import { UserRepository, CreateUserData } from '../../domain/user/user.repository'
+import { UserMapper } from './mappers/user.mapper'
 import { UserEntity } from '../../domain/user/user.entity'
-import { UserRepository } from '../../domain/user/user.repository'
 
 export class PrismaUserRepository implements UserRepository {
   async findByEmail(email: string): Promise<UserEntity | null> {
     const user = await prisma.user.findUnique({ where: { email } })
-
-    if (!user) return null
-
-    //TODO: Need to do a mapper later
-    return new UserEntity(
-      user.id,
-      user.name,
-      user.email,
-      user.password,
-      user.role,
-      user.createdAt
-    )
+    return user ? UserMapper.toDomain(user) : null
   }
 
-  async create(data: { name: string; email: string; password: string }): Promise<UserEntity> {
+  async findById(id: string): Promise<UserEntity | null> {
+    const user = await prisma.user.findUnique({ where: { id } })
+    return user ? UserMapper.toDomain(user) : null
+  }
+
+  async create(data: CreateUserData): Promise<UserEntity> {
     const user = await prisma.user.create({ data })
-    
-    //TODO: Need to do a mapper later
-    return new UserEntity(
-      user.id,
-      user.name,
-      user.email,
-      user.password,
-      user.role,
-      user.createdAt
-    )
+    return UserMapper.toDomain(user)
   }
 }

@@ -35,3 +35,19 @@ GET http://localhost:3333/products
 
 ### Buscar por nome
 GET http://localhost:3333/products?name=tenis
+
+### Listar produtos com paginação
+GET http://localhost:3333/products?page=1&limit=5
+
+### Buscar por nome
+GET http://localhost:3333/products?name=tenis&page=1&limit=10
+
+### Testar validação (deve retornar 422)
+POST http://localhost:3333/users/register
+Content-Type: application/json
+
+{
+  "name": "J",
+  "email": "emailinvalido",
+  "password": "123"
+}
