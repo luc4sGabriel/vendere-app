@@ -3,6 +3,8 @@ import cors from 'cors'
 import { AppError } from '../../shared/errors/app-error'
 import { userRoutes } from './user/user.routes'
 import { productRoutes } from './product/product.routes'
+import { orderRoutes } from './order/order.routes'
+import { categoryRoutes } from './category/category.routes'
 
 export const app = express()
 
@@ -11,6 +13,8 @@ app.use(express.json())
 
 app.use('/users', userRoutes)
 app.use('/products', productRoutes)
+app.use('/categories', categoryRoutes)
+app.use('/orders', orderRoutes)
 
 app.use((err: unknown, req: express.Request, res: express.Response, next: express.NextFunction) => {
   if (err instanceof AppError) {

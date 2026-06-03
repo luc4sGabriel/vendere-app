@@ -1,0 +1,37 @@
+import { OrderRepository } from '../../domain/order/order.repository'
+import { ProductRepository } from '../../domain/product/product.repository'
+import { NotFoundError } from '../../shared/errors/not-found-error'
+
+interface CreateOrderItem {
+  productId: string
+  quantity: number
+}
+
+export class CreateOrderUseCase {
+  constructor(
+    private orderRepository: OrderRepository,
+    private productRepository: ProductRepository
+  ) {}
+
+  async execute(userId: string, items: CreateOrderItem[]) {
+    let total = 0
+    const orderItems = []
+
+    for (const item of items) {
+      const product = await this.productRepository.findById(item.productId)
+
+      if (!product) throw new NotFoundError()
+      if (!product.active) throw new NotFoundError()
+      if (product.stock < item.quantity) throw new NotFoundError(`Insufficient stock for ${product.name}`)
+
+      total += product.price * item.quantity
+      orderItems.push({
+        productId: product.id,
+        quantity: item.quantity,
+        unitPrice: product.price
+      })
+    }
+
+    return this.orderRepository.create({ userId, total, items: orderItems })
+  }
+}
