@@ -17,9 +17,56 @@ Content-Type: application/json
   "password": "123456"
 }
 
-### Criar categoria (precisamos do categoryId)
+### Testar validação (deve retornar 422)
+POST http://localhost:3333/users/register
+Content-Type: application/json
+
+{
+  "name": "J",
+  "email": "emailinvalido",
+  "password": "123"
+}
+
+### Listar categorias
+GET http://localhost:3333/categories
+
+### Buscar categoria por ID
+GET http://localhost:3333/categories/ID_DA_CATEGORIA
+
+### Criar categoria (admin)
+POST http://localhost:3333/categories
+Authorization: Bearer SEU_TOKEN_ADMIN
+Content-Type: application/json
+
+{
+  "name": "Eletrônicos"
+}
+
+### Atualizar categoria (admin)
+PUT http://localhost:3333/categories/ID_DA_CATEGORIA
+Authorization: Bearer SEU_TOKEN_ADMIN
+Content-Type: application/json
+
+{
+  "name": "Eletrônicos e Gadgets"
+}
+
+### Deletar categoria (admin)
+DELETE http://localhost:3333/categories/ID_DA_CATEGORIA
+Authorization: Bearer SEU_TOKEN_ADMIN
+
+### Listar produtos
+GET http://localhost:3333/products
+
+### Listar produtos com paginação
+GET http://localhost:3333/products?page=1&limit=5
+
+### Buscar produto por nome
+GET http://localhost:3333/products?name=tenis&page=1&limit=10
+
+### Criar produto (admin)
 POST http://localhost:3333/products
-Authorization: Bearer SEU_TOKEN_AQUI
+Authorization: Bearer SEU_TOKEN_ADMIN
 Content-Type: application/json
 
 {
@@ -30,24 +77,30 @@ Content-Type: application/json
   "categoryId": "ID_DA_CATEGORIA"
 }
 
-### Listar produtos
-GET http://localhost:3333/products
-
-### Buscar por nome
-GET http://localhost:3333/products?name=tenis
-
-### Listar produtos com paginação
-GET http://localhost:3333/products?page=1&limit=5
-
-### Buscar por nome
-GET http://localhost:3333/products?name=tenis&page=1&limit=10
-
-### Testar validação (deve retornar 422)
-POST http://localhost:3333/users/register
+### Criar pedido
+POST http://localhost:3333/orders
+Authorization: Bearer SEU_TOKEN
 Content-Type: application/json
 
 {
-  "name": "J",
-  "email": "emailinvalido",
-  "password": "123"
+  "items": [
+    { "productId": "ID_DO_PRODUTO", "quantity": 2 }
+  ]
+}
+
+### Listar meus pedidos
+GET http://localhost:3333/orders?page=1&limit=10
+Authorization: Bearer SEU_TOKEN
+
+### Buscar pedido por ID
+GET http://localhost:3333/orders/ID_DO_PEDIDO
+Authorization: Bearer SEU_TOKEN
+
+### Atualizar status (admin)
+PATCH http://localhost:3333/orders/ID_DO_PEDIDO/status
+Authorization: Bearer SEU_TOKEN_ADMIN
+Content-Type: application/json
+
+{
+  "status": "SHIPPED"
 }

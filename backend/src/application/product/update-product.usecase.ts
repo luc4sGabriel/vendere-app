@@ -6,7 +6,7 @@ export class UpdateProductUseCase {
 
   async execute(id: string, data: Partial<CreateProductData>) {
     const product = await this.productRepository.findById(id)
-    if (!product) throw new NotFoundError('Product not found')
+    if (!product) throw new NotFoundError()
     return this.productRepository.update(id, data)
   }
 }
