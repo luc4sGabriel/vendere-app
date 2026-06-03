@@ -1,10 +1,13 @@
 import { UserEntity } from './user.entity'
 
+export interface CreateUserData {
+  name: string
+  email: string
+  password: string
+}
+
 export interface UserRepository {
   findByEmail(email: string): Promise<UserEntity | null>
-  create(data: {
-    name: string
-    email: string
-    password: string
-  }): Promise<UserEntity>
+  findById(id: string): Promise<UserEntity | null>
+  create(data: CreateUserData): Promise<UserEntity>
 }
