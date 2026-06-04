@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
 import { z, ZodType } from 'zod'
-import { AppError } from '../errors/app-error'
 import { UnprocesssableContentError } from '../errors/unprocesssable-content-error'
 
 type Target = 'body' | 'query' | 'params'

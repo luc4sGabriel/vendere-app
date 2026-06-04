@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 import { UnauthorizedError } from '../errors/unauthorized-error'
 import { ForbiddenError } from '../errors/forbidden-error'
+import { env } from '../config/env'
 
 interface TokenPayload {
   id: string
@@ -24,7 +25,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
   const [, token] = authHeader.split(' ')
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as TokenPayload
+    const decoded = jwt.verify(token, env.JWT_SECRET!) as TokenPayload
     req.user = decoded
     next()
   } catch {
