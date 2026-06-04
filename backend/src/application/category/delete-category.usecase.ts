@@ -1,12 +1,19 @@
 import { CategoryRepository } from '../../domain/category/category.repository'
-import { AppError } from '../../shared/errors/app-error'
+import { logger } from '../../shared/config/logger'
+import { NotFoundError } from '../../shared/errors/not-found-error'
 
 export class DeleteCategoryUseCase {
   constructor(private categoryRepository: CategoryRepository) {}
 
   async execute(id: string) {
     const category = await this.categoryRepository.findById(id)
-    if (!category) throw new AppError('Category not found', 404)
-    return this.categoryRepository.delete(id)
+    if (!category) {
+      logger.warn({ categoryId: id }, 'Category not found')
+      throw new NotFoundError('Category not found')
+    }
+
+    await this.categoryRepository.delete(id)
+
+    logger.info({ categoryId: id }, 'Category deleted')
   }
 }
