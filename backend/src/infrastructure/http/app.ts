@@ -38,7 +38,6 @@ app.use(limiter)
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
-    env: env.NODE_ENV,
     timestamp: new Date().toISOString(),
     uptime: `${Math.floor(process.uptime())}s`
   })

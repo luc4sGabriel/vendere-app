@@ -4,7 +4,7 @@ import 'dotenv/config'
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.coerce.number().default(3333),
-  DATABASE_URL: z.string('Invalid DATABASE_URL'),
+  DATABASE_URL: z.url({ message: 'Invalid DATABASE_URL' }),
   JWT_SECRET: z.string().min(8, 'JWT_SECRET must have at least 8 characters'),
   JWT_EXPIRES_IN: z.string().default('7d')
 })
