@@ -2,11 +2,17 @@ import { Request, Response, NextFunction } from 'express'
 import { RegisterUserUseCase } from '../../../application/user/register-user.usecase'
 import { LoginUserUseCase } from '../../../application/user/login-user.usecase'
 import { PrismaUserRepository } from '../../database/prisma-user.repository'
+import { PrismaRefreshTokenRepository } from '../../database/prisma-refresh-token.repository'
+import { RefreshTokenUseCase } from '../../../application/user/refresh-token.usecase'
+import { LogoutUserUseCase } from '../../../application/user/logout-user.usecase'
 
 //TODO: do a factory later
 const userRepository = new PrismaUserRepository()
+const refreshTokenRepo = new PrismaRefreshTokenRepository()
 const registerUserUseCase = new RegisterUserUseCase(userRepository)
-const loginUserUseCase = new LoginUserUseCase(userRepository)
+const loginUserUseCase = new LoginUserUseCase(userRepository, refreshTokenRepo)
+const refreshTokenUseCase = new RefreshTokenUseCase(refreshTokenRepo, userRepository)
+const logoutUserUseCase = new LogoutUserUseCase(refreshTokenRepo)
 
 export class UserController {
   async register(req: Request, res: Response, next: NextFunction) {
@@ -27,5 +33,20 @@ export class UserController {
     } catch (err) {
       next(err)
     }
+  }
+
+  async refresh(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { refreshToken } = req.body
+      const result = await refreshTokenUseCase.execute(refreshToken)
+      return res.status(200).json(result)
+    } catch (err) { next(err) }
+  }
+
+  async logout(req: Request, res: Response, next: NextFunction) {
+    try {
+      await logoutUserUseCase.execute(req.user.id)
+      return res.status(204).send()
+    } catch (err) { next(err) }
   }
 }

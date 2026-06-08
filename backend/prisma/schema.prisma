@@ -12,6 +12,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 model User {
   id        String   @id @default(uuid())
   name      String
@@ -20,6 +21,16 @@ model User {
   role      Role     @default(CUSTOMER)
   createdAt DateTime @default(now())
   orders    Order[]
+  refreshTokens  RefreshToken[]
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }
 
 enum Role {

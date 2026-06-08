@@ -6,7 +6,9 @@ const envSchema = z.object({
   PORT: z.coerce.number().default(3333),
   DATABASE_URL: z.url({ message: 'Invalid DATABASE_URL' }),
   JWT_SECRET: z.string().min(8, 'JWT_SECRET must have at least 8 characters'),
-  JWT_EXPIRES_IN: z.string().default('7d')
+  JWT_EXPIRES_IN: z.string().default('7d'),
+  JWT_REFRESH_SECRET: z.string().min(8, 'JWT_REFRESH_SECRET must have at least 8 characters'),
+  JWT_REFRESH_EXPIRES_IN: z.string().default('30d')
 })
 
 const result = envSchema.safeParse(process.env)

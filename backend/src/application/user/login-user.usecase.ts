@@ -5,9 +5,13 @@ import { UnauthorizedError } from '../../shared/errors/unauthorized-error'
 import { env } from '../../shared/config/env'
 import { BadRequestError } from '../../shared/errors/bad-request-error'
 import { logger } from '../../shared/config/logger'
+import { RefreshTokenRepository } from '../../domain/auth/refresh-token.repository'
 
 export class LoginUserUseCase {
-  constructor(private userRepository: UserRepository) {}
+  constructor(
+    private userRepository: UserRepository,
+    private refreshTokenRepository: RefreshTokenRepository
+  ) {}
 
   async execute(email: string, password: string) {
     const user = await this.userRepository.findByEmail(email)
@@ -24,19 +28,22 @@ export class LoginUserUseCase {
       throw new UnauthorizedError('Invalid credentials')
     }
 
-    const secret = env.JWT_SECRET
-    if (!secret) {
-      logger.error('JWT_SECRET environment variable is required')
-      throw new BadRequestError('JWT_SECRET environment variable is required')
-    }
+    await this.refreshTokenRepository.deleteAllByUserId(user.id)
 
-    const token = jwt.sign({ id: user.id, role: user.role }, secret, { expiresIn: '7d' })
+    const accessToken = jwt.sign(
+      { id: user.id, role: user.role },
+      env.JWT_SECRET as string,
+      { expiresIn: env.JWT_EXPIRES_IN as any }
+    )
 
-    logger.info({ userName: user.name, email }, 'User logged in')
+    const expiresAt = new Date()
+    expiresAt.setDate(expiresAt.getDate() + 30)
+    const { token: refreshToken } = await this.refreshTokenRepository.create(user.id, expiresAt)
 
     return {
       user: { id: user.id, name: user.name, email: user.email, role: user.role },
-      token
+      accessToken,
+      refreshToken
     }
   }
 }
