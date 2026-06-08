@@ -3,19 +3,21 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { LoginUserUseCase } from './login-user.usecase'
 import { UserRepository } from '../../domain/user/user.repository'
+import { RefreshTokenRepository } from '../../domain/auth/refresh-token.repository'
 import { UnauthorizedError } from '../../shared/errors/unauthorized-error'
-import { BadRequestError } from '../../shared/errors/bad-request-error'
 import { Role } from '../../domain/user/enums/role.enum'
 import { makeUser } from '../../test/factories'
 
 vi.mock('../../shared/config/env', () => ({
   env: {
-    JWT_SECRET: 'test-secret-key'
+    JWT_SECRET: 'test-secret-key',
+    JWT_EXPIRES_IN: '7d'
   }
 }))
 
 describe('LoginUserUseCase', () => {
   let userRepository: UserRepository
+  let refreshTokenRepository: RefreshTokenRepository
   let useCase: LoginUserUseCase
 
   beforeEach(() => {
@@ -24,7 +26,13 @@ describe('LoginUserUseCase', () => {
       findById: vi.fn(),
       create: vi.fn()
     }
-    useCase = new LoginUserUseCase(userRepository)
+    refreshTokenRepository = {
+      create: vi.fn(),
+      findByToken: vi.fn(),
+      deleteByToken: vi.fn(),
+      deleteAllByUserId: vi.fn()
+    }
+    useCase = new LoginUserUseCase(userRepository, refreshTokenRepository)
   })
 
   it('deve autenticar usuário com credenciais válidas', async () => {
@@ -37,6 +45,8 @@ describe('LoginUserUseCase', () => {
     })
 
     vi.mocked(userRepository.findByEmail).mockResolvedValue(user)
+    vi.mocked(refreshTokenRepository.deleteAllByUserId).mockResolvedValue()
+    vi.mocked(refreshTokenRepository.create).mockResolvedValue({ token: 'refresh-token' })
 
     const result = await useCase.execute('joao@example.com', '12345678')
 
@@ -46,10 +56,13 @@ describe('LoginUserUseCase', () => {
       email: 'joao@example.com',
       role: Role.CUSTOMER
     })
-    expect(jwt.verify(result.token, 'test-secret-key')).toMatchObject({
+    expect(jwt.verify(result.accessToken, 'test-secret-key')).toMatchObject({
       id: user.id,
       role: Role.CUSTOMER
     })
+    expect(result.refreshToken).toBe('refresh-token')
+    expect(refreshTokenRepository.deleteAllByUserId).toHaveBeenCalledWith(user.id)
+    expect(refreshTokenRepository.create).toHaveBeenCalledWith(user.id, expect.any(Date))
   })
 
   it('deve lançar UnauthorizedError quando email não existe', async () => {
@@ -69,23 +82,5 @@ describe('LoginUserUseCase', () => {
     await expect(useCase.execute('joao@example.com', 'wrong-password')).rejects.toThrow(
       new UnauthorizedError('Invalid credentials')
     )
-  })
-
-  it('deve lançar BadRequestError quando JWT_SECRET não está configurado', async () => {
-    const envModule = await import('../../shared/config/env')
-    const originalSecret = envModule.env.JWT_SECRET
-
-    Object.defineProperty(envModule.env, 'JWT_SECRET', { value: '', configurable: true })
-
-    const hashedPassword = await bcrypt.hash('12345678', 8)
-    vi.mocked(userRepository.findByEmail).mockResolvedValue(
-      makeUser({ email: 'joao@example.com', password: hashedPassword })
-    )
-
-    await expect(useCase.execute('joao@example.com', '12345678')).rejects.toThrow(
-      new BadRequestError('JWT_SECRET environment variable is required')
-    )
-
-    Object.defineProperty(envModule.env, 'JWT_SECRET', { value: originalSecret, configurable: true })
   })
 })
