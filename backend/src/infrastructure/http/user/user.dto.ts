@@ -11,5 +11,11 @@ export const loginUserDto = z.object({
   password: z.string().min(1, 'Password is required')
 })
 
+export const refreshTokenDto = z.object({
+  refreshToken: z.string().min(1, 'Refresh token is required')
+})
+
+
 export type RegisterUserDto = z.infer<typeof registerUserDto>
 export type LoginUserDto = z.infer<typeof loginUserDto>
+export type RefreshTokenDto = z.infer<typeof refreshTokenDto>
