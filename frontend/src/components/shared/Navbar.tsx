@@ -8,6 +8,8 @@ import { authService } from '@/services/auth.service'
 import { useRouter } from 'next/navigation'
 
 export function Navbar() {
+  const hydrated = useCartStore(state => state.hydrated)
+  const authHydrated = useAuthStore(state => state.hydrated)
   const itemCount = useCartStore(state => state.itemCount)
   const { user, clearAuth, isAuthenticated } = useAuthStore()
   const router = useRouter()
@@ -48,22 +50,23 @@ export function Navbar() {
           )}
 
           <Link
-            href="/carrinho"
+            href="/cart"
             className="relative text-gray-600 hover:text-gray-900"
             title="Carrinho"
           >
             <ShoppingCart size={20} />
-            {itemCount() > 0 && (
+            {hydrated && itemCount() > 0 && (
               <span className="absolute -top-2 -right-2 bg-black text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
                 {itemCount()}
               </span>
             )}
           </Link>
 
-          {isAuthenticated() ? (
+          { authHydrated && (
+          isAuthenticated() ? (
             <div className="flex items-center gap-3">
               <Link
-                href="/pedidos"
+                href="/orders"
                 className="text-gray-600 hover:text-gray-900"
                 title={user?.name}
               >
@@ -78,12 +81,15 @@ export function Navbar() {
               </button>
             </div>
           ) : (
-            <Link
-              href="/auth/login"
-              className="bg-black text-white text-sm px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
-            >
-              Entrar
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link href="/auth/register" className="text-sm text-gray-600 hover:text-gray-900 font-medium">
+                Criar conta
+              </Link>
+              <Link href="/auth/login" className="bg-black text-white text-sm px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors">
+                Entrar
+              </Link>
+            </div>
+          )
           )}
         </div>
 
