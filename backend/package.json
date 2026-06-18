@@ -8,7 +8,11 @@
     "build": "tsc",
     "start": "node dist/infrastructure/http/server.js",
     "test": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "seed": "tsx src/scripts/seed.ts"
+  },
+  "prisma": {
+  "seed": "tsx src/scripts/seed.ts"
   },
   "keywords": [],
   "author": "",
