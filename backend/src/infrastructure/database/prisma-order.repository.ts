@@ -55,4 +55,22 @@ export class PrismaOrderRepository implements OrderRepository {
     })
     return OrderMapper.toDomain(order)
   }
+
+  async findAllOrders(params: PaginationParams): Promise<PaginatedResponse<OrderEntity>> {
+    const page = params.page ?? 1
+    const limit = params.limit ?? 10
+    const skip = getPrismaSkip(page, limit)
+  
+    const [orders, total] = await prisma.$transaction([
+      prisma.order.findMany({
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: { items: true }
+      }),
+      prisma.order.count()
+    ])
+  
+    return buildPaginatedResponse(orders.map(OrderMapper.toDomain), total, page, limit)
+  }
 }

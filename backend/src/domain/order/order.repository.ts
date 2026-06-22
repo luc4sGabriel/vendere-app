@@ -18,4 +18,5 @@ export interface OrderRepository {
   findById(id: string): Promise<OrderEntity | null>
   create(data: CreateOrderData): Promise<OrderEntity>
   updateStatus(id: string, status: string): Promise<OrderEntity>
+  findAllOrders(params: PaginationParams): Promise<PaginatedResponse<OrderEntity>>
 }

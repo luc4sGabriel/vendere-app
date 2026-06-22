@@ -8,6 +8,7 @@ const orderController = new OrderController()
 export const orderRoutes = Router()
 
 orderRoutes.get('/', authMiddleware, validate(listOrdersDto, 'query'), (req, res, next) => orderController.list(req, res, next))
+orderRoutes.get('/all', authMiddleware, adminMiddleware, (req, res, next) => orderController.listAll(req, res, next))
 orderRoutes.get('/:id', authMiddleware, (req, res, next) => orderController.get(req, res, next))
 orderRoutes.post('/', authMiddleware, validate(createOrderDto), (req, res, next) => orderController.create(req, res, next))
 orderRoutes.patch('/:id/status', authMiddleware, adminMiddleware, validate(updateOrderStatusDto), (req, res, next) => orderController.updateStatus(req, res, next))
