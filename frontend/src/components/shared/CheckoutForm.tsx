@@ -39,7 +39,7 @@ export function CheckoutForm() {
 
       const order = await orderService.create(orderItems)
       clearCart()
-      router.push(`/pedidos/${order.id}?success=true`)
+      router.push(`/orders/${order.id}?success=true`)
     } catch {
       setError('Erro ao finalizar pedido. Tente novamente.')
     }

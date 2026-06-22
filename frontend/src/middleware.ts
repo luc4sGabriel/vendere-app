@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const protectedRoutes = ['/checkout', '/pedidos', '/dashboard']
+const protectedRoutes = ['/checkout', '/orders', '/dashboard']
 const adminRoutes = ['/dashboard']
-const authRoutes = ['/login', '/register']
+const authRoutes = ['/auth/login', '/auth/register']
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -14,7 +14,7 @@ export function middleware(request: NextRequest) {
   const isAuthRoute = authRoutes.some(r => pathname.startsWith(r))
 
   if (isProtected && !accessToken) {
-    return NextResponse.redirect(new URL('/login', request.url))
+    return NextResponse.redirect(new URL('/auth/login', request.url))
   }
 
   if (isAdmin && userRole !== 'ADMIN') {
