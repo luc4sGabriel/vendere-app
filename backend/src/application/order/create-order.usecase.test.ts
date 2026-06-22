@@ -15,7 +15,8 @@ describe('CreateOrderUseCase', () => {
       findAll: vi.fn(),
       findById: vi.fn(),
       create: vi.fn(),
-      updateStatus: vi.fn()
+      updateStatus: vi.fn(),
+      findAllOrders: vi.fn()
     }
     productRepository = {
       findAll: vi.fn(),
