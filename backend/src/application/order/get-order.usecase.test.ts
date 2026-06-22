@@ -14,7 +14,8 @@ describe('GetOrderUseCase', () => {
       findAll: vi.fn(),
       findById: vi.fn(),
       create: vi.fn(),
-      updateStatus: vi.fn()
+      updateStatus: vi.fn(),
+      findAllOrders: vi.fn()
     }
     useCase = new GetOrderUseCase(orderRepository)
   })
