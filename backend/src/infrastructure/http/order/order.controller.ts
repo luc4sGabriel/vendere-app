@@ -5,6 +5,7 @@ import { CreateOrderUseCase } from '../../../application/order/create-order.usec
 import { ListOrdersUseCase } from '../../../application/order/list-orders.usecase'
 import { GetOrderUseCase } from '../../../application/order/get-order.usecase'
 import { UpdateOrderStatusUseCase } from '../../../application/order/update-order-status.usecase'
+import { ListAllOrdersUseCase } from '../../../application/order/list-all-orders.usecase'
 
 const orderRepo = new PrismaOrderRepository()
 const productRepo = new PrismaProductRepository()
@@ -12,6 +13,7 @@ const createOrder = new CreateOrderUseCase(orderRepo, productRepo)
 const listOrders = new ListOrdersUseCase(orderRepo)
 const getOrder = new GetOrderUseCase(orderRepo)
 const updateOrderStatus = new UpdateOrderStatusUseCase(orderRepo)
+const listAllOrdersUseCase = new ListAllOrdersUseCase(orderRepo)
 
 export class OrderController {
   async create(req: Request, res: Response, next: NextFunction) {
@@ -47,6 +49,17 @@ export class OrderController {
       const { status } = req.body
       const order = await updateOrderStatus.execute(id, status)
       return res.json(order)
+    } catch (err) { next(err) }
+  }
+
+  async listAll(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { page, limit } = req.query
+      const orders = await listAllOrdersUseCase.execute({
+        page: Number(page) || 1,
+        limit: Number(limit) || 10
+      })
+      return res.json(orders)
     } catch (err) { next(err) }
   }
 }
