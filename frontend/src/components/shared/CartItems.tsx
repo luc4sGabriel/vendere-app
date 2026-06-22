@@ -15,7 +15,7 @@ export function CartItems() {
 
   function handleCheckout() {
     if (!isAuthenticated()) {
-      router.push('/login')
+      router.push('/auth/login')
       return
     }
     router.push('/checkout')

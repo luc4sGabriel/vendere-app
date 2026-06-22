@@ -101,7 +101,7 @@ export default function OrderDetailPage() {
       </div>
 
       <div className="flex gap-3">
-        <Link href="/pedidos" className="flex-1">
+        <Link href="/orders" className="flex-1">
           <Button variant="secondary" size="lg" className="w-full">
             Meus pedidos
           </Button>

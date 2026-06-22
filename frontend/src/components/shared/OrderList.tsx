@@ -56,7 +56,7 @@ export function OrderList() {
       {orders.map(order => (
         <Link
           key={order.id}
-          href={`/pedidos/${order.id}`}
+          href={`/orders/${order.id}`}
           className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition-shadow flex items-center justify-between gap-4"
         >
           <div className="flex flex-col gap-1">
